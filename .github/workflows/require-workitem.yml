@@ -1,0 +1,19 @@
+name: Require Work Item Link
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  check-workitem:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR for Azure Boards Work Item
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prTitle = context.payload.pull_request.title;
+            const prBody  = context.payload.pull_request.body || "";
+            const regex = /AB#\d+/;
+            if (!regex.test(prTitle) && !regex.test(prBody)) {
+              core.setFailed("❌ PR must reference an Azure Boards Work Item (AB#<id>).");
+            }
